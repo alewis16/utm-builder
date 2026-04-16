@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UTM builder — Ninety One</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#1a1a1a;padding:2rem 1rem}
+  .wrap{max-width:720px;margin:0 auto}
+  h1{font-size:20px;font-weight:600;margin-bottom:4px}
+  .sub{font-size:13px;color:#666;margin-bottom:1.5rem}
+  .card{background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
+  .card-title{font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:1rem}
+  .field{margin-bottom:1rem}
+  .field:last-child{margin-bottom:0}
+  label{display:block;font-size:13px;color:#555;margin-bottom:4px}
+  .req{color:#c94c1e;margin-left:2px}
+  .opt{font-size:11px;color:#aaa;margin-left:4px}
+  input,select{width:100%;font-size:14px;padding:0 10px;height:36px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#1a1a1a;outline:none}
+  input:focus,select:focus{border-color:#378ADD;box-shadow:0 0 0 3px #378ADD22}
+  select:disabled{opacity:0.5;cursor:not-allowed;background:#f9f9f9}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .src-toggle{display:flex;gap:8px;margin-bottom:10px}
+  .tog-btn{flex:1;height:32px;font-size:13px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#666;cursor:pointer;transition:all 0.15s}
+  .tog-btn.active{background:#e8f1fb;border-color:#378ADD;color:#185FA5;font-weight:600}
+  .medium-hint{font-size:11px;color:#aaa;margin-top:4px;display:none}
+  .auto-badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;background:#e6f4ee;color:#1D9E75;margin-left:6px;font-weight:500}
+  .err{font-size:12px;color:#c94c1e;margin-top:4px;display:none}
+  .gen-btn{width:100%;height:44px;font-size:15px;font-weight:600;border:none;border-radius:8px;background:#1a1a1a;color:#fff;cursor:pointer;margin-bottom:1.5rem;transition:background 0.15s}
+  .gen-btn:hover{background:#333}
+  .output-card{background:#f9f9f7;border:1px solid #e5e5e5;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
+  .out-label{font-size:11px;font-weight:600;color:#aaa;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px}
+  .out-val{font-size:13px;font-family:'SF Mono',Monaco,'Cascadia Code',monospace;color:#1a1a1a;word-break:break-all;line-height:1.6;min-height:20px}
+  .copy-btn{margin-top:8px;height:30px;padding:0 14px;font-size:12px;border:1px solid #ddd;border-radius:6px;background:#fff;color:#555;cursor:pointer;transition:all 0.15s}
+  .copy-btn:hover{background:#f0f0f0}
+  .copy-btn.copied{color:#1D9E75;border-color:#1D9E75}
+  .log-section{margin-top:2rem}
+  .log-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem}
+  .log-title{font-size:15px;font-weight:600;color:#1a1a1a}
+  .log-actions{display:flex;gap:8px}
+  .sm-btn{height:30px;padding:0 12px;font-size:12px;border:1px solid #ddd;border-radius:6px;background:#fff;color:#555;cursor:pointer}
+  .sm-btn:hover{background:#f0f0f0}
+  .log-table-wrap{overflow-x:auto;border:1px solid #e5e5e5;border-radius:8px}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th{background:#f5f5f3;padding:8px 10px;text-align:left;font-weight:600;color:#888;white-space:nowrap;border-bottom:1px solid #e5e5e5}
+  td{padding:7px 10px;color:#1a1a1a;border-bottom:1px solid #f0f0f0;white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis}
+  tr:last-child td{border-bottom:none}
+  .empty-log{padding:2rem;text-align:center;font-size:13px;color:#aaa}
+  @media(max-width:500px){.row2,.row3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>UTM builder</h1>
+  <p class="sub">Generate consistent, correctly formatted UTM parameters for all campaigns.</p>
+
+  <div class="card">
+    <div class="card-title">Campaign details</div>
+    <div class="field">
+      <label>Base URL <span class="req">*</span></label>
+      <input type="text" id="baseUrl" placeholder="https://ninetyone.com/page">
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label>Your initials <span class="req">*</span></label>
+        <input type="text" id="initials" maxlength="4" placeholder="e.g. AJ" style="text-transform:uppercase">
+      </div>
+      <div class="field" style="grid-column:span 2">
+        <label>Region / team <span class="req">*</span></label>
+        <select id="region">
+          <option value="">Select region</option>
+          <option value="Africa">Africa</option>
+          <option value="Asia">Asia</option>
+          <option value="RoW">RoW</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">UTM parameters</div>
+
+    <div class="field">
+      <label>Source <span class="req">*</span></label>
+      <div class="src-toggle">
+        <button class="tog-btn active" id="togOwned" onclick="setSourceType('owned')">Owned</button>
+        <button class="tog-btn" id="togExternal" onclick="setSourceType('external')">External / Third party</button>
+      </div>
+      <div id="srcOwned">
+        <select id="sourceOwned" onchange="onSourceChange()">
+          <option value="">Select source</option>
+          <option value="facebook">facebook</option>
+          <option value="instagram">instagram</option>
+          <option value="linkedin">linkedin</option>
+          <option value="x">x</option>
+          <option value="tiktok">tiktok</option>
+          <option value="pinterest">pinterest</option>
+          <option value="youtube">youtube</option>
+          <option value="reddit">reddit</option>
+          <option value="pardot">pardot</option>
+        </select>
+      </div>
+      <div id="srcExternal" style="display:none">
+        <input type="text" id="sourceExternal" placeholder="e.g. dailymaverick, citywire-wm" list="extSuggestions" oninput="onSourceChange()">
+        <datalist id="extSuggestions">
+          <option value="dailymaverick">
+          <option value="moneyweb">
+          <option value="hket">
+          <option value="citywire-wm">
+        </datalist>
+        <p style="font-size:11px;color:#aaa;margin-top:4px">Auto-converted to lowercase. Use hyphens, no spaces.</p>
+      </div>
+      <p class="err" id="errSource">Source is required</p>
+    </div>
+
+    <div class="field">
+      <label>Medium <span class="req">*</span><span class="auto-badge" id="autoBadge" style="display:none">Auto-set</span></label>
+      <select id="medium">
+        <option value="">Select medium</option>
+        <option value="email">email</option>
+        <option value="paid-social">paid-social</option>
+        <option value="organic-social">organic-social</option>
+        <option value="display">display</option>
+        <option value="cpc">cpc</option>
+      </select>
+      <p class="medium-hint" id="mediumHint"></p>
+      <p class="err" id="errMedium">Medium is required</p>
+    </div>
+
+    <div class="field">
+      <label>Campaign <span class="opt">optional</span></label>
+      <select id="campaign">
+        <option value="">None</option>
+        <option value="change-is-opportunity">change-is-opportunity</option>
+        <option value="investment-institute">investment-institute</option>
+        <option value="tfsa-2026">tfsa-2026</option>
+        <option value="taking-stock-event">taking-stock-event</option>
+        <option value="all-china-equity-fund">all-china-equity-fund</option>
+        <option value="quarterly-fund-updates">quarterly-fund-updates</option>
+      </select>
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <label>Content — placement <span class="opt">optional</span></label>
+        <select id="contentPlacement">
+          <option value="">None</option>
+          <option value="primary-cta">primary-cta</option>
+          <option value="secondary-cta">secondary-cta</option>
+          <option value="tertiary-cta">tertiary-cta</option>
+          <option value="logo-header">logo-header</option>
+          <option value="logo-footer">logo-footer</option>
+          <option value="title-link">title-link</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Content — format <span class="opt">optional</span></label>
+        <select id="contentFormat">
+          <option value="">None</option>
+          <option value="button-link">button-link</option>
+          <option value="carousel">carousel</option>
+          <option value="splash-ad">splash-ad</option>
+          <option value="text-link">text-link</option>
+          <option value="thumbnail-link">thumbnail-link</option>
+          <option value="link-in-bio">link-in-bio</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <button class="gen-btn" onclick="generate()">Generate UTM</button>
+
+  <div id="outputSection" style="display:none">
+    <div class="output-card">
+      <div class="out-label">Full URL</div>
+      <div class="out-val" id="outFullUrl"></div>
+      <button class="copy-btn" id="copyFull" onclick="copyText('outFullUrl','copyFull')">Copy</button>
+    </div>
+    <div class="output-card">
+      <div class="out-label">UTM string only</div>
+      <div class="out-val" id="outUtmString"></div>
+      <button class="copy-btn" id="copyUtm" onclick="copyText('outUtmString','copyUtm')">Copy</button>
+    </div>
+  </div>
+
+  <div class="log-section">
+    <div class="log-header">
+      <span class="log-title">Generation log</span>
+      <div class="log-actions">
+        <button class="sm-btn" onclick="clearLog()">Clear</button>
+        <button class="sm-btn" onclick="exportCSV()">Export CSV</button>
+      </div>
+    </div>
+    <div class="log-table-wrap" id="logWrap">
+      <div class="empty-log">No UTMs generated yet. Your log will appear here.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+let sourceType = 'owned';
+let log = [];
+
+const MEDIUM_RULES = {
+  facebook:  ['paid-social','organic-social'],
+  instagram: ['paid-social','organic-social'],
+  linkedin:  ['paid-social','organic-social'],
+  x:         ['paid-social','organic-social'],
+  tiktok:    ['paid-social','organic-social'],
+  pinterest: ['paid-social','organic-social'],
+  reddit:    ['paid-social','organic-social'],
+  youtube:   ['email','paid-social','organic-social','display','cpc'],
+  pardot:    ['email']
+};
+
+const ALL_MEDIUMS = ['email','paid-social','organic-social','display','cpc'];
+
+function setSourceType(t){
+  sourceType = t;
+  document.getElementById('srcOwned').style.display = t==='owned' ? 'block' : 'none';
+  document.getElementById('srcExternal').style.display = t==='external' ? 'block' : 'none';
+  document.getElementById('togOwned').classList.toggle('active', t==='owned');
+  document.getElementById('togExternal').classList.toggle('active', t==='external');
+  onSourceChange();
+}
+
+function getSourceValue(){
+  if(sourceType==='owned') return document.getElementById('sourceOwned').value;
+  return document.getElementById('sourceExternal').value.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9\-]/g,'');
+}
+
+function onSourceChange(){
+  const src = sourceType==='owned' ? document.getElementById('sourceOwned').value : '_external';
+  const medSel = document.getElementById('medium');
+  const hint = document.getElementById('mediumHint');
+  const badge = document.getElementById('autoBadge');
+
+  if(src === 'pardot'){
+    updateMediumOptions(['email']);
+    medSel.value = 'email';
+    medSel.disabled = true;
+    badge.style.display = 'inline-block';
+    hint.style.display = 'none';
+  } else if(src && src !== '_external' && MEDIUM_RULES[src]){
+    const allowed = MEDIUM_RULES[src];
+    updateMediumOptions(allowed);
+    medSel.disabled = false;
+    badge.style.display = 'none';
+    hint.textContent = 'Available for this source: ' + allowed.join(', ');
+    hint.style.display = 'block';
+  } else {
+    updateMediumOptions(ALL_MEDIUMS);
+    medSel.disabled = false;
+    badge.style.display = 'none';
+    hint.style.display = 'none';
+  }
+}
+
+function updateMediumOptions(allowed){
+  const medSel = document.getElementById('medium');
+  const current = medSel.value;
+  medSel.innerHTML = '<option value="">Select medium</option>';
+  allowed.forEach(m => {
+    const o = document.createElement('option');
+    o.value = m; o.textContent = m;
+    medSel.appendChild(o);
+  });
+  if(allowed.includes(current)) medSel.value = current;
+}
+
+function buildUtmString(p){
+  let parts = [];
+  if(p.source)   parts.push('utm_source='+encodeURIComponent(p.source));
+  if(p.medium)   parts.push('utm_medium='+encodeURIComponent(p.medium));
+  if(p.campaign) parts.push('utm_campaign='+encodeURIComponent(p.campaign));
+  if(p.content)  parts.push('utm_content='+encodeURIComponent(p.content));
+  return parts.length ? '?'+parts.join('&') : '';
+}
+
+function buildFullUrl(base, utmStr){
+  return base.replace(/\/+$/, '') + utmStr;
+}
+
+function validate(source, medium){
+  let ok = true;
+  document.getElementById('errSource').style.display = !source ? 'block' : 'none';
+  document.getElementById('errMedium').style.display = !medium ? 'block' : 'none';
+  if(!source || !medium) ok = false;
+  return ok;
+}
+
+function generate(){
+  const initials = document.getElementById('initials').value.trim().toUpperCase();
+  const region   = document.getElementById('region').value;
+  const base     = document.getElementById('baseUrl').value.trim();
+  const source   = getSourceValue();
+  const medium   = document.getElementById('medium').value;
+  const campaign = document.getElementById('campaign').value;
+  const cp       = document.getElementById('contentPlacement').value;
+  const cf       = document.getElementById('contentFormat').value;
+  const content  = cp && cf ? cp+'-'+cf : (cp || cf);
+
+  if(!validate(source, medium)) return;
+
+  const utmStr  = buildUtmString({source, medium, campaign, content});
+  const fullUrl = base ? buildFullUrl(base, utmStr) : utmStr;
+
+  document.getElementById('outFullUrl').textContent  = fullUrl;
+  document.getElementById('outUtmString').textContent = utmStr;
+  document.getElementById('outputSection').style.display = 'block';
+
+  log.unshift({
+    timestamp: new Date().toLocaleString('en-GB'),
+    initials:  initials  || '—',
+    region:    region    || '—',
+    base:      base      || '—',
+    source, medium,
+    campaign:  campaign  || '—',
+    content:   content   || '—',
+    fullUrl,
+    utmString: utmStr
+  });
+  renderLog();
+}
+
+function renderLog(){
+  const wrap = document.getElementById('logWrap');
+  if(!log.length){ wrap.innerHTML='<div class="empty-log">No UTMs generated yet.</div>'; return; }
+  const cols   = ['timestamp','initials','region','source','medium','campaign','content','base','fullUrl','utmString'];
+  const labels = ['Timestamp','Initials','Region','Source','Medium','Campaign','Content','Base URL','Full URL','UTM string'];
+  let html = '<table><thead><tr>'+labels.map(l=>'<th>'+l+'</th>').join('')+'</tr></thead><tbody>';
+  log.forEach(r => {
+    html += '<tr>'+cols.map(c=>'<td title="'+(r[c]||'')+'">'+r[c]+'</td>').join('')+'</tr>';
+  });
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
+function copyText(id, btnId){
+  const val = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(val).then(() => {
+    const btn = document.getElementById(btnId);
+    btn.textContent = 'Copied';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent='Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function exportCSV(){
+  if(!log.length) return;
+  const cols   = ['timestamp','initials','region','source','medium','campaign','content','base','fullUrl','utmString'];
+  const labels = ['Timestamp','Initials','Region','Source','Medium','Campaign','Content','Base URL','Full URL','UTM string'];
+  let csv = labels.join(',')+'\n';
+  log.forEach(r => {
+    csv += cols.map(c=>'"'+(r[c]||'').replace(/"/g,'""')+'"').join(',')+'\n';
+  });
+  const blob = new Blob([csv],{type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'utm-log.csv';
+  a.click();
+}
+
+function clearLog(){
+  if(log.length && confirm('Clear all log entries?')){ log=[]; renderLog(); }
+}
+</script>
+</body>
+</html>
