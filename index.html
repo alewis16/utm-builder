@@ -4,86 +4,207 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>UTM builder — Ninety One</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
+  :root{
+    --burgundy:#591739;
+    --burgundy-dark:#3C0E26;
+    --pb01:#652043;
+    --pb02:#511536;
+    --coral:#FBAA96;
+    --coral-dark:#e8856a;
+    --coral-light:#fde8e0;
+    --white:#ffffff;
+    --off-white:#fdf8f6;
+    --border:#e8d8d2;
+    --border-dark:#d4b8b0;
+    --text-primary:#2a0d1a;
+    --text-secondary:#7a4558;
+    --text-muted:#b08090;
+    --success:#2d7a5a;
+    --success-bg:#e8f5ee;
+    --error:#c94c1e;
+  }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#1a1a1a;padding:2rem 1rem}
-  .wrap{max-width:720px;margin:0 auto}
-  h1{font-size:20px;font-weight:600;margin-bottom:4px}
-  .sub{font-size:13px;color:#666;margin-bottom:1.5rem}
-  .card{background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
-  .card-title{font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:1rem}
-  .field{margin-bottom:1rem}
+  body{font-family:'DM Sans',sans-serif;background:var(--off-white);color:var(--text-primary);min-height:100vh}
+
+  /* ── Header ── */
+  .header{
+    position:relative;
+    background:var(--burgundy);
+    background-image:url('header-bg.jpeg');
+    background-size:cover;
+    background-position:center 40%;
+    padding:2.5rem 2rem;
+    overflow:hidden;
+  }
+  .header-overlay{
+    position:absolute;inset:0;
+    background:rgba(89,23,57,0.72);
+  }
+  .header-content{position:relative;z-index:1;max-width:740px;margin:0 auto}
+  .header-title{color:var(--white);font-size:28px;font-weight:600;letter-spacing:0.01em;margin-bottom:6px}
+  .header-sub{color:rgba(255,255,255,0.75);font-size:14px;font-weight:400;line-height:1.5;max-width:480px}
+  .header-badge{
+    display:inline-block;margin-top:14px;
+    background:rgba(251,170,150,0.2);border:1px solid rgba(251,170,150,0.5);
+    color:var(--coral);font-size:11px;padding:4px 12px;border-radius:20px;font-weight:500
+  }
+
+  /* ── Layout ── */
+  .main{max-width:740px;margin:0 auto;padding:2rem 1rem 3rem}
+
+  .card{background:var(--coral-light);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin-bottom:1rem}
+  .card-title{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:1.25rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border-dark)}
+
+  /* ── Fields ── */
+  .field{margin-bottom:1.1rem}
   .field:last-child{margin-bottom:0}
-  label{display:block;font-size:13px;color:#555;margin-bottom:4px}
-  .req{color:#c94c1e;margin-left:2px}
-  .opt{font-size:11px;color:#aaa;margin-left:4px}
-  input,select{width:100%;font-size:14px;padding:0 10px;height:36px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#1a1a1a;outline:none}
-  input:focus,select:focus{border-color:#378ADD;box-shadow:0 0 0 3px #378ADD22}
-  select:disabled{opacity:0.5;cursor:not-allowed;background:#f9f9f9}
+
+  .field-label-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+  label{font-size:15px;color:var(--text-primary);font-weight:500;line-height:1}
+  .req{color:var(--coral-dark);margin-left:1px}
+  .opt{font-size:11px;color:var(--text-muted);font-weight:400;margin-left:2px}
+
+  /* ── Tooltip ── */
+  .tooltip-wrap{position:relative;display:inline-flex;align-items:center}
+  .tooltip-icon{
+    width:16px;height:16px;border-radius:50%;
+    background:var(--text-muted);color:var(--white);
+    font-size:10px;font-weight:600;
+    display:inline-flex;align-items:center;justify-content:center;
+    cursor:pointer;flex-shrink:0;line-height:1;
+    user-select:none;transition:background 0.15s;
+  }
+  .tooltip-icon:hover{background:var(--burgundy)}
+  .tooltip-bubble{
+    display:none;position:absolute;
+    bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
+    background:var(--burgundy);color:var(--white);
+    font-size:12px;line-height:1.5;font-weight:400;
+    padding:10px 14px;border-radius:8px;
+    width:240px;z-index:100;pointer-events:none;
+    box-shadow:0 4px 16px rgba(89,23,57,0.25);
+  }
+  .tooltip-bubble::after{
+    content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);
+    border:6px solid transparent;border-top-color:var(--burgundy);
+  }
+  .tooltip-wrap:hover .tooltip-bubble{display:block}
+
+  input,select{
+    width:100%;font-size:14px;font-family:'DM Sans',sans-serif;
+    padding:0 12px;height:38px;
+    border:1px solid var(--border-dark);border-radius:8px;
+    background:var(--white);color:var(--text-primary);
+    outline:none;transition:border-color 0.15s,box-shadow 0.15s;
+    appearance:none;-webkit-appearance:none;
+  }
+  select{
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a4558' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 12px center;
+    background-color:var(--white);padding-right:32px;
+  }
+  input:focus,select:focus{border-color:var(--burgundy);box-shadow:0 0 0 3px rgba(89,23,57,0.1)}
+  select:disabled{opacity:0.45;cursor:not-allowed;background-color:#faf6f5}
+
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+
+  /* ── Source toggle ── */
   .src-toggle{display:flex;gap:8px;margin-bottom:10px}
-  .tog-btn{flex:1;height:32px;font-size:13px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#666;cursor:pointer;transition:all 0.15s}
-  .tog-btn.active{background:#e8f1fb;border-color:#378ADD;color:#185FA5;font-weight:600}
-  .medium-hint{font-size:11px;color:#aaa;margin-top:4px;display:none}
-  .auto-badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;background:#e6f4ee;color:#1D9E75;margin-left:6px;font-weight:500}
-  .err{font-size:12px;color:#c94c1e;margin-top:4px;display:none}
-  .gen-btn{width:100%;height:44px;font-size:15px;font-weight:600;border:none;border-radius:8px;background:#1a1a1a;color:#fff;cursor:pointer;margin-bottom:1.5rem;transition:background 0.15s}
-  .gen-btn:hover{background:#333}
-  .output-card{background:#f9f9f7;border:1px solid #e5e5e5;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
-  .out-label{font-size:11px;font-weight:600;color:#aaa;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px}
-  .out-val{font-size:13px;font-family:'SF Mono',Monaco,'Cascadia Code',monospace;color:#1a1a1a;word-break:break-all;line-height:1.6;min-height:20px}
-  .copy-btn{margin-top:8px;height:30px;padding:0 14px;font-size:12px;border:1px solid #ddd;border-radius:6px;background:#fff;color:#555;cursor:pointer;transition:all 0.15s}
-  .copy-btn:hover{background:#f0f0f0}
-  .copy-btn.copied{color:#1D9E75;border-color:#1D9E75}
+  .tog-btn{
+    flex:1;height:34px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:500;
+    border:1px solid var(--border-dark);border-radius:8px;
+    background:var(--white);color:var(--text-secondary);
+    cursor:pointer;transition:all 0.15s;
+  }
+  .tog-btn:hover{border-color:var(--coral-dark);color:var(--coral-dark)}
+  .tog-btn.active{background:var(--coral);border-color:var(--coral-dark);color:var(--burgundy);font-weight:600}
+
+  .hint{font-size:11px;color:var(--text-muted);margin-top:5px;display:none;line-height:1.5}
+  .auto-badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;background:var(--success-bg);color:var(--success);margin-left:6px;font-weight:500}
+  .err{font-size:12px;color:var(--error);margin-top:4px;display:none}
+  .divider{height:1px;background:var(--border-dark);margin:1.25rem 0}
+
+  /* ── Generate button ── */
+  .gen-btn{
+    width:100%;height:46px;font-size:15px;font-weight:600;font-family:'DM Sans',sans-serif;
+    border:none;border-radius:10px;background:var(--burgundy);color:var(--white);
+    cursor:pointer;margin-bottom:1.5rem;transition:background 0.15s,transform 0.1s;
+  }
+  .gen-btn:hover{background:var(--pb01)}
+  .gen-btn:active{transform:scale(0.99)}
+
+  /* ── Output ── */
+  .output-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:1.25rem;margin-bottom:10px;border-left:3px solid var(--coral)}
+  .out-label{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px}
+  .out-val{font-size:13px;font-family:monospace;color:var(--text-primary);word-break:break-all;line-height:1.7;background:var(--off-white);padding:10px 12px;border-radius:6px;border:1px solid var(--border)}
+  .copy-btn{margin-top:10px;height:32px;padding:0 16px;font-size:12px;font-family:'DM Sans',sans-serif;font-weight:500;border:1px solid var(--border-dark);border-radius:6px;background:var(--white);color:var(--text-secondary);cursor:pointer;transition:all 0.15s}
+  .copy-btn:hover{border-color:var(--burgundy);color:var(--burgundy)}
+  .copy-btn.copied{color:var(--success);border-color:var(--success);background:var(--success-bg)}
+
+  /* ── Log ── */
   .log-section{margin-top:2rem}
   .log-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem}
-  .log-title{font-size:15px;font-weight:600;color:#1a1a1a}
+  .log-title{font-size:15px;font-weight:600}
+  .log-count{font-size:12px;color:var(--text-muted);margin-left:8px;font-weight:400}
   .log-actions{display:flex;gap:8px}
-  .sm-btn{height:30px;padding:0 12px;font-size:12px;border:1px solid #ddd;border-radius:6px;background:#fff;color:#555;cursor:pointer}
-  .sm-btn:hover{background:#f0f0f0}
-  .log-table-wrap{overflow-x:auto;border:1px solid #e5e5e5;border-radius:8px}
+  .sm-btn{height:32px;padding:0 14px;font-size:12px;font-family:'DM Sans',sans-serif;font-weight:500;border:1px solid var(--border-dark);border-radius:6px;background:var(--white);color:var(--text-secondary);cursor:pointer;transition:all 0.15s}
+  .sm-btn:hover{border-color:var(--burgundy);color:var(--burgundy)}
+  .sm-btn.export{background:var(--burgundy);border-color:var(--burgundy);color:var(--white)}
+  .sm-btn.export:hover{background:var(--pb01)}
+  .log-table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:var(--white)}
   table{width:100%;border-collapse:collapse;font-size:12px}
-  th{background:#f5f5f3;padding:8px 10px;text-align:left;font-weight:600;color:#888;white-space:nowrap;border-bottom:1px solid #e5e5e5}
-  td{padding:7px 10px;color:#1a1a1a;border-bottom:1px solid #f0f0f0;white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis}
+  th{background:var(--burgundy);padding:9px 12px;text-align:left;font-weight:500;color:rgba(255,255,255,0.85);white-space:nowrap;font-size:11px;letter-spacing:0.04em}
+  th:first-child{border-radius:9px 0 0 0}
+  th:last-child{border-radius:0 9px 0 0}
+  td{padding:8px 12px;border-bottom:1px solid var(--border);white-space:nowrap;max-width:150px;overflow:hidden;text-overflow:ellipsis}
   tr:last-child td{border-bottom:none}
-  .empty-log{padding:2rem;text-align:center;font-size:13px;color:#aaa}
-  @media(max-width:500px){.row2,.row3{grid-template-columns:1fr}}
+  tr:hover td{background:var(--off-white)}
+  .empty-log{padding:2.5rem;text-align:center;font-size:13px;color:var(--text-muted)}
+
+  @media(max-width:520px){.row2{grid-template-columns:1fr}.header{padding:2rem 1rem}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>UTM builder</h1>
-  <p class="sub">Generate consistent, correctly formatted UTM parameters for all campaigns.</p>
 
-  <div class="card">
-    <div class="card-title">Campaign details</div>
-    <div class="field">
-      <label>Base URL <span class="req">*</span></label>
-      <input type="text" id="baseUrl" placeholder="https://ninetyone.com/page">
-    </div>
-    <div class="row3">
-      <div class="field">
-        <label>Your initials <span class="req">*</span></label>
-        <input type="text" id="initials" maxlength="4" placeholder="e.g. AJ" style="text-transform:uppercase">
-      </div>
-      <div class="field" style="grid-column:span 2">
-        <label>Region / team <span class="req">*</span></label>
-        <select id="region">
-          <option value="">Select region</option>
-          <option value="Africa">Africa</option>
-          <option value="Asia">Asia</option>
-          <option value="RoW">RoW</option>
-        </select>
-      </div>
-    </div>
+<div class="header">
+  <div class="header-overlay"></div>
+  <div class="header-content">
+    <div class="header-title">UTM builder</div>
+    <div class="header-sub">This tool is designed to create global consistency in how we use UTM tags</div>
+    <div class="header-badge">Internal tool</div>
   </div>
+</div>
+
+<div class="main">
 
   <div class="card">
     <div class="card-title">UTM parameters</div>
 
+    <!-- Base URL -->
     <div class="field">
-      <label>Source <span class="req">*</span></label>
+      <div class="field-label-row">
+        <label>Base URL <span class="req">*</span></label>
+        <div class="tooltip-wrap">
+          <div class="tooltip-icon">?</div>
+          <div class="tooltip-bubble">The destination URL you want to track. Paste the full address including https://</div>
+        </div>
+      </div>
+      <input type="text" id="baseUrl" placeholder="https://ninetyone.com/page">
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Source -->
+    <div class="field">
+      <div class="field-label-row">
+        <label>Source <span class="req">*</span></label>
+        <div class="tooltip-wrap">
+          <div class="tooltip-icon">?</div>
+          <div class="tooltip-bubble">Where your traffic is coming from — the platform or publisher sending visitors to your page.</div>
+        </div>
+      </div>
       <div class="src-toggle">
         <button class="tog-btn active" id="togOwned" onclick="setSourceType('owned')">Owned</button>
         <button class="tog-btn" id="togExternal" onclick="setSourceType('external')">External / Third party</button>
@@ -110,13 +231,20 @@
           <option value="hket">
           <option value="citywire-wm">
         </datalist>
-        <p style="font-size:11px;color:#aaa;margin-top:4px">Auto-converted to lowercase. Use hyphens, no spaces.</p>
+        <p class="hint" style="display:block">Auto-converted to lowercase. Use hyphens, no spaces.</p>
       </div>
       <p class="err" id="errSource">Source is required</p>
     </div>
 
+    <!-- Medium -->
     <div class="field">
-      <label>Medium <span class="req">*</span><span class="auto-badge" id="autoBadge" style="display:none">Auto-set</span></label>
+      <div class="field-label-row">
+        <label>Medium <span class="req">*</span><span class="auto-badge" id="autoBadge" style="display:none">Auto-set</span></label>
+        <div class="tooltip-wrap">
+          <div class="tooltip-icon">?</div>
+          <div class="tooltip-bubble">The marketing channel or format — how the link is being delivered to your audience.</div>
+        </div>
+      </div>
       <select id="medium">
         <option value="">Select medium</option>
         <option value="email">email</option>
@@ -125,12 +253,19 @@
         <option value="display">display</option>
         <option value="cpc">cpc</option>
       </select>
-      <p class="medium-hint" id="mediumHint"></p>
+      <p class="hint" id="mediumHint"></p>
       <p class="err" id="errMedium">Medium is required</p>
     </div>
 
+    <!-- Campaign -->
     <div class="field">
-      <label>Campaign <span class="opt">optional</span></label>
+      <div class="field-label-row">
+        <label>Campaign <span class="opt">optional</span></label>
+        <div class="tooltip-wrap">
+          <div class="tooltip-icon">?</div>
+          <div class="tooltip-bubble">Only apply the campaign field if this sits within a wider campaign. Not all links need a campaign.</div>
+        </div>
+      </div>
       <select id="campaign">
         <option value="">None</option>
         <option value="change-is-opportunity">change-is-opportunity</option>
@@ -142,9 +277,16 @@
       </select>
     </div>
 
+    <!-- Content -->
     <div class="row2">
       <div class="field">
-        <label>Content — placement <span class="opt">optional</span></label>
+        <div class="field-label-row">
+          <label>Content — placement <span class="opt">optional</span></label>
+          <div class="tooltip-wrap">
+            <div class="tooltip-icon">?</div>
+            <div class="tooltip-bubble">Where the link sits within the page or email — helps identify which position drives clicks.</div>
+          </div>
+        </div>
         <select id="contentPlacement">
           <option value="">None</option>
           <option value="primary-cta">primary-cta</option>
@@ -156,7 +298,13 @@
         </select>
       </div>
       <div class="field">
-        <label>Content — format <span class="opt">optional</span></label>
+        <div class="field-label-row">
+          <label>Content — format <span class="opt">optional</span></label>
+          <div class="tooltip-wrap">
+            <div class="tooltip-icon">?</div>
+            <div class="tooltip-bubble">The visual or creative format of the link — helps compare performance across different formats.</div>
+          </div>
+        </div>
         <select id="contentFormat">
           <option value="">None</option>
           <option value="button-link">button-link</option>
@@ -168,6 +316,7 @@
         </select>
       </div>
     </div>
+
   </div>
 
   <button class="gen-btn" onclick="generate()">Generate UTM</button>
@@ -187,16 +336,20 @@
 
   <div class="log-section">
     <div class="log-header">
-      <span class="log-title">Generation log</span>
+      <div>
+        <span class="log-title">Generation log</span>
+        <span class="log-count" id="logCount"></span>
+      </div>
       <div class="log-actions">
         <button class="sm-btn" onclick="clearLog()">Clear</button>
-        <button class="sm-btn" onclick="exportCSV()">Export CSV</button>
+        <button class="sm-btn export" onclick="exportCSV()">Export CSV</button>
       </div>
     </div>
     <div class="log-table-wrap" id="logWrap">
       <div class="empty-log">No UTMs generated yet. Your log will appear here.</div>
     </div>
   </div>
+
 </div>
 
 <script>
@@ -214,14 +367,13 @@ const MEDIUM_RULES = {
   youtube:   ['email','paid-social','organic-social','display','cpc'],
   pardot:    ['email']
 };
-
 const ALL_MEDIUMS = ['email','paid-social','organic-social','display','cpc'];
 
 function setSourceType(t){
   sourceType = t;
-  document.getElementById('srcOwned').style.display = t==='owned' ? 'block' : 'none';
+  document.getElementById('srcOwned').style.display    = t==='owned'    ? 'block' : 'none';
   document.getElementById('srcExternal').style.display = t==='external' ? 'block' : 'none';
-  document.getElementById('togOwned').classList.toggle('active', t==='owned');
+  document.getElementById('togOwned').classList.toggle('active',    t==='owned');
   document.getElementById('togExternal').classList.toggle('active', t==='external');
   onSourceChange();
 }
@@ -232,34 +384,34 @@ function getSourceValue(){
 }
 
 function onSourceChange(){
-  const src = sourceType==='owned' ? document.getElementById('sourceOwned').value : '_external';
+  const src   = sourceType==='owned' ? document.getElementById('sourceOwned').value : '_external';
   const medSel = document.getElementById('medium');
-  const hint = document.getElementById('mediumHint');
-  const badge = document.getElementById('autoBadge');
+  const hint   = document.getElementById('mediumHint');
+  const badge  = document.getElementById('autoBadge');
 
-  if(src === 'pardot'){
+  if(src==='pardot'){
     updateMediumOptions(['email']);
     medSel.value = 'email';
     medSel.disabled = true;
     badge.style.display = 'inline-block';
-    hint.style.display = 'none';
-  } else if(src && src !== '_external' && MEDIUM_RULES[src]){
+    hint.style.display  = 'none';
+  } else if(src && src!=='_external' && MEDIUM_RULES[src]){
     const allowed = MEDIUM_RULES[src];
     updateMediumOptions(allowed);
     medSel.disabled = false;
     badge.style.display = 'none';
-    hint.textContent = 'Available for this source: ' + allowed.join(', ');
-    hint.style.display = 'block';
+    hint.textContent    = 'Available for this source: ' + allowed.join(', ');
+    hint.style.display  = 'block';
   } else {
     updateMediumOptions(ALL_MEDIUMS);
     medSel.disabled = false;
     badge.style.display = 'none';
-    hint.style.display = 'none';
+    hint.style.display  = 'none';
   }
 }
 
 function updateMediumOptions(allowed){
-  const medSel = document.getElementById('medium');
+  const medSel  = document.getElementById('medium');
   const current = medSel.value;
   medSel.innerHTML = '<option value="">Select medium</option>';
   allowed.forEach(m => {
@@ -272,11 +424,11 @@ function updateMediumOptions(allowed){
 
 function buildUtmString(p){
   let parts = [];
-  if(p.source)   parts.push('utm_source='+encodeURIComponent(p.source));
-  if(p.medium)   parts.push('utm_medium='+encodeURIComponent(p.medium));
-  if(p.campaign) parts.push('utm_campaign='+encodeURIComponent(p.campaign));
-  if(p.content)  parts.push('utm_content='+encodeURIComponent(p.content));
-  return parts.length ? '?'+parts.join('&') : '';
+  if(p.source)   parts.push('utm_source='   + encodeURIComponent(p.source));
+  if(p.medium)   parts.push('utm_medium='   + encodeURIComponent(p.medium));
+  if(p.campaign) parts.push('utm_campaign=' + encodeURIComponent(p.campaign));
+  if(p.content)  parts.push('utm_content='  + encodeURIComponent(p.content));
+  return parts.length ? '?' + parts.join('&') : '';
 }
 
 function buildFullUrl(base, utmStr){
@@ -292,8 +444,6 @@ function validate(source, medium){
 }
 
 function generate(){
-  const initials = document.getElementById('initials').value.trim().toUpperCase();
-  const region   = document.getElementById('region').value;
   const base     = document.getElementById('baseUrl').value.trim();
   const source   = getSourceValue();
   const medium   = document.getElementById('medium').value;
@@ -307,18 +457,16 @@ function generate(){
   const utmStr  = buildUtmString({source, medium, campaign, content});
   const fullUrl = base ? buildFullUrl(base, utmStr) : utmStr;
 
-  document.getElementById('outFullUrl').textContent  = fullUrl;
+  document.getElementById('outFullUrl').textContent   = fullUrl;
   document.getElementById('outUtmString').textContent = utmStr;
   document.getElementById('outputSection').style.display = 'block';
 
   log.unshift({
     timestamp: new Date().toLocaleString('en-GB'),
-    initials:  initials  || '—',
-    region:    region    || '—',
-    base:      base      || '—',
+    base:      base     || '—',
     source, medium,
-    campaign:  campaign  || '—',
-    content:   content   || '—',
+    campaign:  campaign || '—',
+    content:   content  || '—',
     fullUrl,
     utmString: utmStr
   });
@@ -326,10 +474,15 @@ function generate(){
 }
 
 function renderLog(){
-  const wrap = document.getElementById('logWrap');
-  if(!log.length){ wrap.innerHTML='<div class="empty-log">No UTMs generated yet.</div>'; return; }
-  const cols   = ['timestamp','initials','region','source','medium','campaign','content','base','fullUrl','utmString'];
-  const labels = ['Timestamp','Initials','Region','Source','Medium','Campaign','Content','Base URL','Full URL','UTM string'];
+  const wrap  = document.getElementById('logWrap');
+  const count = document.getElementById('logCount');
+  count.textContent = log.length ? log.length + ' entr' + (log.length===1?'y':'ies') : '';
+  if(!log.length){
+    wrap.innerHTML = '<div class="empty-log">No UTMs generated yet. Your log will appear here.</div>';
+    return;
+  }
+  const cols   = ['timestamp','source','medium','campaign','content','base','fullUrl','utmString'];
+  const labels = ['Timestamp','Source','Medium','Campaign','Content','Base URL','Full URL','UTM string'];
   let html = '<table><thead><tr>'+labels.map(l=>'<th>'+l+'</th>').join('')+'</tr></thead><tbody>';
   log.forEach(r => {
     html += '<tr>'+cols.map(c=>'<td title="'+(r[c]||'')+'">'+r[c]+'</td>').join('')+'</tr>';
@@ -350,15 +503,15 @@ function copyText(id, btnId){
 
 function exportCSV(){
   if(!log.length) return;
-  const cols   = ['timestamp','initials','region','source','medium','campaign','content','base','fullUrl','utmString'];
-  const labels = ['Timestamp','Initials','Region','Source','Medium','Campaign','Content','Base URL','Full URL','UTM string'];
-  let csv = labels.join(',')+'\n';
+  const cols   = ['timestamp','source','medium','campaign','content','base','fullUrl','utmString'];
+  const labels = ['Timestamp','Source','Medium','Campaign','Content','Base URL','Full URL','UTM string'];
+  let csv = labels.join(',') + '\n';
   log.forEach(r => {
-    csv += cols.map(c=>'"'+(r[c]||'').replace(/"/g,'""')+'"').join(',')+'\n';
+    csv += cols.map(c => '"'+(r[c]||'').replace(/"/g,'""')+'"').join(',') + '\n';
   });
   const blob = new Blob([csv],{type:'text/csv'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
   a.download = 'utm-log.csv';
   a.click();
 }
