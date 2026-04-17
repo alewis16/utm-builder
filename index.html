@@ -163,8 +163,6 @@
   tr:hover td{background:var(--off-white)}
   .empty-log{padding:2.5rem;text-align:center;font-size:13px;color:var(--text-muted)}
 
-  .advocate-field{display:none;margin-top:1rem;padding:1rem;background:var(--white);border:1px solid var(--coral-dark);border-radius:8px;border-left:3px solid var(--coral-dark)}
-  .advocate-label-note{font-size:11px;color:var(--text-muted);margin-top:4px}
   @media(max-width:520px){.row2{grid-template-columns:1fr}.header{padding:2rem 1rem}}
 </style>
 </head>
@@ -223,6 +221,8 @@
           <option value="tiktok">tiktok</option>
           <option value="pinterest">pinterest</option>
           <option value="reddit">reddit</option>
+          <option value="outlook">outlook</option>
+          <option value="pdf">pdf</option>
         </select>
       </div>
       <div id="srcExternal" style="display:none">
@@ -247,7 +247,7 @@
           <div class="tooltip-bubble">The marketing channel or format — how the link is being delivered to your audience.</div>
         </div>
       </div>
-      <select id="medium" onchange="onMediumChange()">
+      <select id="medium">
         <option value="">Select medium</option>
         <option value="email">email</option>
         <option value="paid-social">paid-social</option>
@@ -255,47 +255,10 @@
         <option value="organic-social">organic-social</option>
         <option value="display">display</option>
         <option value="cpc">cpc</option>
+        <option value="pdf-document">pdf-document</option>
       </select>
       <p class="hint" id="mediumHint"></p>
       <p class="err" id="errMedium">Medium is required</p>
-    </div>
-
-    <!-- Advocate section — shown only when advocate-social is selected -->
-    <div class="advocate-field" id="advocateField">
-      <div class="field-label-row">
-        <label style="font-size:13px;color:var(--text-secondary)">Select advocate</label>
-        <div class="tooltip-wrap">
-          <div class="tooltip-icon">?</div>
-          <div class="tooltip-bubble">Select the colleague who will be posting the link. Their name is tracked via utm_term so you can measure individual advocate impact.</div>
-        </div>
-      </div>
-      <div class="row2" style="margin-bottom:10px">
-        <div>
-          <label style="font-size:13px;color:var(--text-secondary);margin-bottom:4px;display:block">Region <span class="req">*</span></label>
-          <select id="advocateRegion" onchange="onRegionChange()">
-            <option value="">Select region</option>
-            <option value="Africa">Africa</option>
-            <option value="AsiaPac">AsiaPac</option>
-            <option value="Europe">Europe</option>
-            <option value="North America">North America</option>
-            <option value="UK">UK</option>
-          </select>
-        </div>
-        <div>
-          <label style="font-size:13px;color:var(--text-secondary);margin-bottom:4px;display:block">Team <span class="req">*</span></label>
-          <select id="advocateTeam" onchange="onTeamChange()" disabled>
-            <option value="">Select team</option>
-          </select>
-        </div>
-      </div>
-      <div>
-        <label style="font-size:13px;color:var(--text-secondary);margin-bottom:4px;display:block">Name <span class="req">*</span></label>
-        <select id="advocateName" disabled>
-          <option value="">Select name</option>
-        </select>
-      </div>
-      <p class="advocate-label-note">Tracked as utm_term in your UTM string.</p>
-      <p class="err" id="errAdvocate">Please select a region, team and name</p>
     </div>
 
     <!-- Campaign -->
@@ -315,6 +278,8 @@
         <option value="taking-stock-event">taking-stock-event</option>
         <option value="all-china-equity-fund">all-china-equity-fund</option>
         <option value="quarterly-fund-updates">quarterly-fund-updates</option>
+        <option value="35-year-event">35-year-event</option>
+        <option value="em-perspectives">em-perspectives</option>
       </select>
     </div>
 
@@ -406,96 +371,11 @@ const MEDIUM_RULES = {
   pinterest: ['paid-social','organic-social'],
   reddit:    ['paid-social','organic-social'],
   youtube:   ['email','paid-social','organic-social','display','cpc'],
-  pardot:    ['email']
+  pardot:    ['email'],
+  outlook:   ['email'],
+  pdf:       ['pdf-document']
 };
-const ALL_MEDIUMS = ['email','paid-social','organic-social','display','cpc','advocate-social'];
-
-const ADVOCATES = {
-  'Africa': {
-    'Client group':    ['David Stronach','Thabo Khojane'],
-    'Investment team': ['Lisa MacLeod','Tshiphiri Muedi'],
-    'Other':           ['Jeremy Gardiner','Kotie Basson']
-  },
-  'AsiaPac': {
-    'Client group':    ['Kevin Kong','Stephen Small'],
-    'Investment team': ['Joaana Yang','Wenchang Ma']
-  },
-  'Europe': {
-    'Client group': ['Aymeric François','Kevin Troesch']
-  },
-  'North America': {
-    'Client group':    ['Katherine Tweedie','Sangeeth Sewnath'],
-    'Investment team': ['Abrie Pretorius','Elias Erikson']
-  },
-  'UK': {
-    'Client group':    ['Joshua Kriskinans','Tom Peberdy'],
-    'Investment team': ['Deirdre Cooper','Sahil Mahtani'],
-    'Other':           ['Hendrik du Toit','Lucia Pino-Garcia']
-  }
-};
-
-function nameToSlug(name){
-  return name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9\-]/g,'');
-}
-
-function onMediumChange(){
-  const med = document.getElementById('medium').value;
-  const af  = document.getElementById('advocateField');
-  af.style.display = med === 'advocate-social' ? 'block' : 'none';
-  if(med !== 'advocate-social'){
-    resetAdvocateCascade();
-    document.getElementById('errAdvocate').style.display = 'none';
-  }
-}
-
-function resetAdvocateCascade(){
-  const regionSel = document.getElementById('advocateRegion');
-  const teamSel   = document.getElementById('advocateTeam');
-  const nameSel   = document.getElementById('advocateName');
-  regionSel.value = '';
-  teamSel.innerHTML = '<option value="">Select team</option>';
-  teamSel.disabled  = true;
-  nameSel.innerHTML = '<option value="">Select name</option>';
-  nameSel.disabled  = true;
-}
-
-function onRegionChange(){
-  const region  = document.getElementById('advocateRegion').value;
-  const teamSel = document.getElementById('advocateTeam');
-  const nameSel = document.getElementById('advocateName');
-  teamSel.innerHTML = '<option value="">Select team</option>';
-  nameSel.innerHTML = '<option value="">Select name</option>';
-  nameSel.disabled  = true;
-  if(!region || !ADVOCATES[region]){
-    teamSel.disabled = true;
-    return;
-  }
-  const teams = Object.keys(ADVOCATES[region]).sort();
-  teams.forEach(t => {
-    const o = document.createElement('option');
-    o.value = t; o.textContent = t;
-    teamSel.appendChild(o);
-  });
-  teamSel.disabled = teams.length === 0;
-}
-
-function onTeamChange(){
-  const region  = document.getElementById('advocateRegion').value;
-  const team    = document.getElementById('advocateTeam').value;
-  const nameSel = document.getElementById('advocateName');
-  nameSel.innerHTML = '<option value="">Select name</option>';
-  if(!region || !team || !ADVOCATES[region] || !ADVOCATES[region][team]){
-    nameSel.disabled = true;
-    return;
-  }
-  const names = ADVOCATES[region][team].sort();
-  names.forEach(n => {
-    const o = document.createElement('option');
-    o.value = nameToSlug(n); o.textContent = n;
-    nameSel.appendChild(o);
-  });
-  nameSel.disabled = false;
-}
+const ALL_MEDIUMS = ['email','paid-social','organic-social','display','cpc','advocate-social','pdf-document'];
 
 function setSourceType(t){
   sourceType = t;
@@ -517,9 +397,15 @@ function onSourceChange(){
   const hint   = document.getElementById('mediumHint');
   const badge  = document.getElementById('autoBadge');
 
-  if(src==='pardot'){
+  if(src==='pardot' || src==='outlook'){
     updateMediumOptions(['email']);
     medSel.value = 'email';
+    medSel.disabled = true;
+    badge.style.display = 'inline-block';
+    hint.style.display  = 'none';
+  } else if(src==='pdf'){
+    updateMediumOptions(['pdf-document']);
+    medSel.value = 'pdf-document';
     medSel.disabled = true;
     badge.style.display = 'inline-block';
     hint.style.display  = 'none';
@@ -548,7 +434,6 @@ function updateMediumOptions(allowed){
     medSel.appendChild(o);
   });
   if(allowed.includes(current)) medSel.value = current;
-  onMediumChange();
 }
 
 function buildUtmString(p){
@@ -557,7 +442,6 @@ function buildUtmString(p){
   if(p.medium)   parts.push('utm_medium='   + encodeURIComponent(p.medium));
   if(p.campaign) parts.push('utm_campaign=' + encodeURIComponent(p.campaign));
   if(p.content)  parts.push('utm_content='  + encodeURIComponent(p.content));
-  if(p.term)     parts.push('utm_term='     + encodeURIComponent(p.term));
   return parts.length ? '?' + parts.join('&') : '';
 }
 
@@ -565,50 +449,40 @@ function buildFullUrl(base, utmStr){
   return base.replace(/\/+$/, '') + utmStr;
 }
 
-function validate(source, medium, advocate){
+function validate(source, medium){
   let ok = true;
-  document.getElementById('errSource').style.display   = !source ? 'block' : 'none';
-  document.getElementById('errMedium').style.display   = !medium ? 'block' : 'none';
-  const needsAdvocate = medium === 'advocate-social';
-  const advocateOk    = !needsAdvocate || (advocate && document.getElementById('advocateRegion').value && document.getElementById('advocateTeam').value);
-  document.getElementById('errAdvocate').style.display = (needsAdvocate && !advocateOk) ? 'block' : 'none';
-  if(!source || !medium || (needsAdvocate && !advocateOk)) ok = false;
+  document.getElementById('errSource').style.display = !source ? 'block' : 'none';
+  document.getElementById('errMedium').style.display = !medium ? 'block' : 'none';
+  if(!source || !medium) ok = false;
   return ok;
 }
 
 function generate(){
-  const base      = document.getElementById('baseUrl').value.trim();
-  const source    = getSourceValue();
-  const medium    = document.getElementById('medium').value;
-  const campaign  = document.getElementById('campaign').value;
-  const cp        = document.getElementById('contentPlacement').value;
-  const cf        = document.getElementById('contentFormat').value;
-  const content   = cp && cf ? cp+'-'+cf : (cp || cf);
-  const advocate  = document.getElementById('advocateName').value;
-  const term      = medium === 'advocate-social' ? advocate : '';
+  const base     = document.getElementById('baseUrl').value.trim();
+  const source   = getSourceValue();
+  const medium   = document.getElementById('medium').value;
+  const campaign = document.getElementById('campaign').value;
+  const cp       = document.getElementById('contentPlacement').value;
+  const cf       = document.getElementById('contentFormat').value;
+  const content  = cp && cf ? cp+'-'+cf : (cp || cf);
 
-  if(!validate(source, medium, advocate)) return;
+  if(!validate(source, medium)) return;
 
-  const utmStr  = buildUtmString({source, medium, campaign, content, term});
+  const utmStr  = buildUtmString({source, medium, campaign, content});
   const fullUrl = base ? buildFullUrl(base, utmStr) : utmStr;
 
   document.getElementById('outFullUrl').textContent   = fullUrl;
   document.getElementById('outUtmString').textContent = utmStr;
   document.getElementById('outputSection').style.display = 'block';
 
-  const advRegion = document.getElementById('advocateRegion').value || '—';
-  const advTeam   = document.getElementById('advocateTeam').value   || '—';
   log.unshift({
-    timestamp:    new Date().toLocaleString('en-GB'),
-    base:         base      || '—',
+    timestamp: new Date().toLocaleString('en-GB'),
+    base:      base     || '—',
     source, medium,
-    advRegion,
-    advTeam,
-    advocate:     advocate  || '—',
-    campaign:     campaign  || '—',
-    content:      content   || '—',
+    campaign:  campaign || '—',
+    content:   content  || '—',
     fullUrl,
-    utmString:    utmStr
+    utmString: utmStr
   });
   renderLog();
 }
@@ -621,8 +495,8 @@ function renderLog(){
     wrap.innerHTML = '<div class="empty-log">No UTMs generated yet. Your log will appear here.</div>';
     return;
   }
-  const cols   = ['timestamp','source','medium','advRegion','advTeam','advocate','campaign','content','base','fullUrl','utmString'];
-  const labels = ['Timestamp','Source','Medium','Region','Team','Advocate','Campaign','Content','Base URL','Full URL','UTM string'];
+  const cols   = ['timestamp','source','medium','campaign','content','base','fullUrl','utmString'];
+  const labels = ['Timestamp','Source','Medium','Campaign','Content','Base URL','Full URL','UTM string'];
   let html = '<table><thead><tr>'+labels.map(l=>'<th>'+l+'</th>').join('')+'</tr></thead><tbody>';
   log.forEach(r => {
     html += '<tr>'+cols.map(c=>'<td title="'+(r[c]||'')+'">'+r[c]+'</td>').join('')+'</tr>';
@@ -643,8 +517,8 @@ function copyText(id, btnId){
 
 function exportCSV(){
   if(!log.length) return;
-  const cols   = ['timestamp','source','medium','advRegion','advTeam','advocate','campaign','content','base','fullUrl','utmString'];
-  const labels = ['Timestamp','Source','Medium','Region','Team','Advocate','Campaign','Content','Base URL','Full URL','UTM string'];
+  const cols   = ['timestamp','source','medium','campaign','content','base','fullUrl','utmString'];
+  const labels = ['Timestamp','Source','Medium','Campaign','Content','Base URL','Full URL','UTM string'];
   let csv = labels.join(',') + '\n';
   log.forEach(r => {
     csv += cols.map(c => '"'+(r[c]||'').replace(/"/g,'""')+'"').join(',') + '\n';
