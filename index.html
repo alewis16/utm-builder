@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UTM builder - Ninety One</title>
+<title>UTM builder — Ninety One</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -205,7 +205,7 @@
         <label>Source <span class="req">*</span></label>
         <div class="tooltip-wrap">
           <div class="tooltip-icon">?</div>
-          <div class="tooltip-bubble">Where your traffic is coming from - the platform or publisher sending visitors to your page.</div>
+          <div class="tooltip-bubble">Where your traffic is coming from — the platform or publisher sending visitors to your page.</div>
         </div>
       </div>
       <div class="src-toggle">
@@ -248,7 +248,7 @@
         <label>Medium <span class="req">*</span><span class="auto-badge" id="autoBadge" style="display:none">Auto-set</span></label>
         <div class="tooltip-wrap">
           <div class="tooltip-icon">?</div>
-          <div class="tooltip-bubble">The marketing channel or format - how the link is being delivered to your audience.</div>
+          <div class="tooltip-bubble">The marketing channel or format — how the link is being delivered to your audience.</div>
         </div>
       </div>
       <select id="medium" onchange="onMediumChange()">
@@ -265,7 +265,7 @@
       <p class="err" id="errMedium">Medium is required</p>
     </div>
 
-    <!-- Advocate section - shown only when advocate-social is selected -->
+    <!-- Advocate section — shown only when advocate-social is selected -->
     <div class="advocate-field" id="advocateField">
       <div class="field-label-row">
         <label style="font-size:13px;color:var(--text-secondary)">Select advocate</label>
@@ -329,10 +329,10 @@
     <div class="row2">
       <div class="field">
         <div class="field-label-row">
-          <label>Content - placement <span class="opt">optional</span></label>
+          <label>Content — placement <span class="opt">optional</span></label>
           <div class="tooltip-wrap">
             <div class="tooltip-icon">?</div>
-            <div class="tooltip-bubble">Where the link sits within the page or email - helps identify which position drives clicks.</div>
+            <div class="tooltip-bubble">Where the link sits within the page or email — helps identify which position drives clicks.</div>
           </div>
         </div>
         <select id="contentPlacement">
@@ -349,10 +349,10 @@
       </div>
       <div class="field">
         <div class="field-label-row">
-          <label>Content - format <span class="opt">optional</span></label>
+          <label>Content — format <span class="opt">optional</span></label>
           <div class="tooltip-wrap">
             <div class="tooltip-icon">?</div>
-            <div class="tooltip-bubble">The visual or creative format of the link - helps compare performance across different formats.</div>
+            <div class="tooltip-bubble">The visual or creative format of the link — helps compare performance across different formats.</div>
           </div>
         </div>
         <select id="contentFormat">
@@ -649,17 +649,17 @@ function generate(){
   document.getElementById('outUtmString').textContent = utmStr;
   document.getElementById('outputSection').style.display = 'block';
 
-  const advRegion = document.getElementById('advocateRegion').value || '-';
-  const advTeam   = document.getElementById('advocateTeam').value   || '-';
+  const advRegion = document.getElementById('advocateRegion').value || '—';
+  const advTeam   = document.getElementById('advocateTeam').value   || '—';
   log.unshift({
     timestamp: new Date().toLocaleString('en-GB'),
-    base:      base      || '-',
+    base:      base      || '—',
     source, medium,
     advRegion,
     advTeam,
-    advocate:  advocate  || '-',
-    campaign:  campaign  || '-',
-    content:   content   || '-',
+    advocate:  advocate  || '—',
+    campaign:  campaign  || '—',
+    content:   content   || '—',
     fullUrl,
     utmString: utmStr
   });
