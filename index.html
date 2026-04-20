@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UTM builder - Ninety One</title>
+<title>UTM builder — Ninety One</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -205,7 +205,7 @@
         <label>Source <span class="req">*</span></label>
         <div class="tooltip-wrap">
           <div class="tooltip-icon">?</div>
-          <div class="tooltip-bubble">Where your traffic is coming from - the platform or publisher sending visitors to your page.</div>
+          <div class="tooltip-bubble">Where your traffic is coming from — the platform or publisher sending visitors to your page.</div>
         </div>
       </div>
       <div class="src-toggle">
@@ -248,7 +248,7 @@
         <label>Medium <span class="req">*</span><span class="auto-badge" id="autoBadge" style="display:none">Auto-set</span></label>
         <div class="tooltip-wrap">
           <div class="tooltip-icon">?</div>
-          <div class="tooltip-bubble">The marketing channel or format - how the link is being delivered to your audience.</div>
+          <div class="tooltip-bubble">The marketing channel or format — how the link is being delivered to your audience.</div>
         </div>
       </div>
       <select id="medium" onchange="onMediumChange()">
@@ -265,7 +265,7 @@
       <p class="err" id="errMedium">Medium is required</p>
     </div>
 
-    <!-- Advocate section - shown only when advocate-social is selected -->
+    <!-- Advocate section — shown only when advocate-social is selected -->
     <div class="advocate-field" id="advocateField">
       <div class="field-label-row">
         <label style="font-size:13px;color:var(--text-secondary)">Select advocate</label>
@@ -329,10 +329,10 @@
     <div class="row2">
       <div class="field">
         <div class="field-label-row">
-          <label>Content - placement <span class="opt">optional</span></label>
+          <label>Content — placement <span class="opt">optional</span></label>
           <div class="tooltip-wrap">
             <div class="tooltip-icon">?</div>
-            <div class="tooltip-bubble">Where the link sits within the page or email - helps identify which position drives clicks.</div>
+            <div class="tooltip-bubble">Where the link sits within the page or email — helps identify which position drives clicks.</div>
           </div>
         </div>
         <select id="contentPlacement">
@@ -343,24 +343,31 @@
           <option value="logo-header">logo-header</option>
           <option value="logo-footer">logo-footer</option>
           <option value="title-link">title-link</option>
+          <option value="post-body">post-body</option>
+          <option value="comments">comments</option>
         </select>
       </div>
       <div class="field">
         <div class="field-label-row">
-          <label>Content - format <span class="opt">optional</span></label>
+          <label>Content — format <span class="opt">optional</span></label>
           <div class="tooltip-wrap">
             <div class="tooltip-icon">?</div>
-            <div class="tooltip-bubble">The visual or creative format of the link - helps compare performance across different formats.</div>
+            <div class="tooltip-bubble">The visual or creative format of the link — helps compare performance across different formats.</div>
           </div>
         </div>
         <select id="contentFormat">
           <option value="">None</option>
+          <option value="article">article</option>
           <option value="button-link">button-link</option>
           <option value="carousel">carousel</option>
+          <option value="document">document</option>
+          <option value="poll">poll</option>
+          <option value="single-image">single-image</option>
           <option value="splash-ad">splash-ad</option>
           <option value="text-link">text-link</option>
           <option value="thumbnail-link">thumbnail-link</option>
           <option value="link-in-bio">link-in-bio</option>
+          <option value="video">video</option>
         </select>
       </div>
     </div>
@@ -452,6 +459,7 @@ function onMediumChange(){
   const af  = document.getElementById('advocateField');
   af.style.display = med === 'advocate-social' ? 'block' : 'none';
   if(med !== 'advocate-social') resetAdvocateCascade();
+  updateContentOptions();
 }
 
 function resetAdvocateCascade(){
@@ -549,6 +557,51 @@ function updateMediumOptions(allowed){
   });
   if(allowed.includes(current)) medSel.value = current;
   onMediumChange();
+  updateContentOptions();
+}
+
+
+const CONTENT_FORMAT_DEFAULT = ['article','button-link','carousel','document','poll','single-image','splash-ad','text-link','thumbnail-link','link-in-bio','video'];
+const CONTENT_FORMAT_LINKEDIN_ORGANIC = ['single-image','video','carousel','article','poll'];
+const CONTENT_FORMAT_LINKEDIN_PAID    = ['single-image','video','carousel','document','article'];
+const CONTENT_PLACEMENT_DEFAULT = ['primary-cta','secondary-cta','tertiary-cta','logo-header','logo-footer','title-link','post-body','comments'];
+const CONTENT_PLACEMENT_NON_LINKEDIN = ['primary-cta','secondary-cta','tertiary-cta','logo-header','logo-footer','title-link'];
+
+function updateContentOptions(){
+  const src = document.getElementById('sourceOwned') ? document.getElementById('sourceOwned').value : '';
+  const med = document.getElementById('medium').value;
+  const isLinkedIn = (src === 'linkedin');
+  const isOrganic  = (med === 'organic-social');
+  const isPaid     = (med === 'paid-social');
+
+  const fmtSel = document.getElementById('contentFormat');
+  const plcSel = document.getElementById('contentPlacement');
+  const fmtVal = fmtSel.value;
+  const plcVal = plcSel.value;
+
+  let formats    = CONTENT_FORMAT_DEFAULT;
+  let placements = CONTENT_PLACEMENT_NON_LINKEDIN;
+
+  if(isLinkedIn && isOrganic) formats = CONTENT_FORMAT_LINKEDIN_ORGANIC;
+  else if(isLinkedIn && isPaid) formats = CONTENT_FORMAT_LINKEDIN_PAID;
+
+  if(isLinkedIn && (isOrganic || isPaid)) placements = CONTENT_PLACEMENT_DEFAULT;
+
+  fmtSel.innerHTML = '<option value="">None</option>';
+  formats.forEach(v => {
+    const o = document.createElement('option');
+    o.value = v; o.textContent = v;
+    fmtSel.appendChild(o);
+  });
+  if(formats.includes(fmtVal)) fmtSel.value = fmtVal;
+
+  plcSel.innerHTML = '<option value="">None</option>';
+  placements.forEach(v => {
+    const o = document.createElement('option');
+    o.value = v; o.textContent = v;
+    plcSel.appendChild(o);
+  });
+  if(placements.includes(plcVal)) plcSel.value = plcVal;
 }
 
 function buildUtmString(p){
@@ -596,17 +649,17 @@ function generate(){
   document.getElementById('outUtmString').textContent = utmStr;
   document.getElementById('outputSection').style.display = 'block';
 
-  const advRegion = document.getElementById('advocateRegion').value || '-';
-  const advTeam   = document.getElementById('advocateTeam').value   || '-';
+  const advRegion = document.getElementById('advocateRegion').value || '—';
+  const advTeam   = document.getElementById('advocateTeam').value   || '—';
   log.unshift({
     timestamp: new Date().toLocaleString('en-GB'),
-    base:      base      || '-',
+    base:      base      || '—',
     source, medium,
     advRegion,
     advTeam,
-    advocate:  advocate  || '-',
-    campaign:  campaign  || '-',
-    content:   content   || '-',
+    advocate:  advocate  || '—',
+    campaign:  campaign  || '—',
+    content:   content   || '—',
     fullUrl,
     utmString: utmStr
   });
